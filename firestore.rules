@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to create and read their own user profile
+    match /users/{userId} {
+      allow create, read, update: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to create issuer profiles with their own userId
+    match /issuers/{issuerId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Allow admins to read and update all issuer profiles
+      allow read, update: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Allow verified issuers to create and manage documents
+    match /documents/{documentId} {
+      // Allow creation if user is authenticated and owns a verified issuer profile
+      allow create: if request.auth != null && 
+        exists(/databases/$(database)/documents/issuers/$(request.resource.data.issuerId)) &&
+        get(/databases/$(database)/documents/issuers/$(request.resource.data.issuerId)).data.userId == request.auth.uid &&
+        get(/databases/$(database)/documents/issuers/$(request.resource.data.issuerId)).data.status == 'verified';
+      
+      // Allow read and update if user owns the issuer that created the document
+      allow read, update: if request.auth != null && 
+        exists(/databases/$(database)/documents/issuers/$(resource.data.issuerId)) &&
+        get(/databases/$(database)/documents/issuers/$(resource.data.issuerId)).data.userId == request.auth.uid;
+      
+      // Allow public read access for verification
+      allow read: if true;
+      
+      // Allow admins to read all documents
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Allow public read and create access to verification logs for transparency
+    match /verificationLogs/{logId} {
+      allow read, create: if true;
+    }
+  }
+}

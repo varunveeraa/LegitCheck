@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to upload issuer support documents
+    match /issuer_support_docs/{userEmail}/{fileName} {
+      allow write: if request.auth != null && request.auth.token.email == userEmail;
+      allow read: if request.auth != null;
+    }
+    
+    // Allow verified issuers to upload issued documents
+    match /issued_docs/{userId}/{fileName} {
+      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null;
+    }
+    
+    // Allow public read access to issued documents for verification
+    match /issued_docs/{userId}/{fileName} {
+      allow read: if true;
+    }
+    
+    // Allow admins to read all issuer support documents
+    match /issuer_support_docs/{userEmail}/{fileName} {
+      allow read: if request.auth != null && 
+        exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Default deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
