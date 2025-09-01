@@ -90,131 +90,188 @@ const VerifyDocument: React.FC = () => {
     const { document, isValid, message } = verificationResult;
 
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
-        {/* Verification Details - Left Side */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <div className="text-center mb-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Success Header */}
+        <div className="text-center mb-8">
+          <div className="relative inline-flex items-center justify-center">
             {isValid ? (
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <>
+                <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
+                <div className="relative bg-gradient-to-r from-green-500 to-emerald-500 rounded-full p-4 shadow-lg">
+                  <CheckCircle className="h-12 w-12 text-white" />
+                </div>
+              </>
             ) : (
-              <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+              <>
+                <div className="absolute inset-0 bg-red-400 rounded-full animate-ping opacity-20"></div>
+                <div className="relative bg-gradient-to-r from-red-500 to-pink-500 rounded-full p-4 shadow-lg">
+                  <XCircle className="h-12 w-12 text-white" />
+                </div>
+              </>
             )}
-            <h2 className={`text-2xl font-bold mb-2 ${isValid ? 'text-green-700' : 'text-red-700'}`}>
-              {isValid ? 'Document Verified' : 'Verification Failed'}
-            </h2>
-            <p className="text-gray-600">{message}</p>
           </div>
+          <h1 className={`text-4xl font-bold mt-6 mb-3 ${isValid ? 'text-green-700' : 'text-red-700'}`}>
+            {isValid ? '✅ Document Verified' : '❌ Verification Failed'}
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">{message}</p>
+          {isValid && (
+            <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-full">
+              <Shield className="h-4 w-4 text-green-600 mr-2" />
+              <span className="text-green-700 font-medium text-sm">Cryptographically Secure</span>
+            </div>
+          )}
+        </div>
 
-          {document && (
-            <div className="space-y-4 border-t pt-6">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Document Title</label>
-                  <p className="text-gray-900 font-medium">{document.title}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Document Type</label>
-                  <p className="text-gray-900 capitalize">{document.documentType}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Issued By</label>
-                  <p className="text-gray-900 font-medium">{document.issuerName}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Issued Date</label>
-                  <p className="text-gray-900">{document.issuedAt.toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Recipient</label>
-                  <p className="text-gray-900">{document.recipientName}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    document.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {document.status}
-                  </span>
-                </div>
-              </div>
-              
-              {document.description && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                  <p className="text-gray-900">{document.description}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Document Information Card */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+              <h2 className="text-xl font-bold text-white flex items-center">
+                <FileText className="h-6 w-6 mr-2" />
+                Document Information
+              </h2>
+            </div>
+            <div className="p-6">
+              {document && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Document Title</label>
+                      <p className="text-lg font-bold text-gray-900">{document.title}</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <label className="block text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Type</label>
+                        <p className="text-gray-900 font-medium capitalize">{document.documentType}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4">
+                        <label className="block text-sm font-semibold text-purple-600 uppercase tracking-wide mb-2">Status</label>
+                        <span className={`inline-flex px-3 py-1 text-sm font-bold rounded-full ${
+                          document.status === 'active' 
+                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                            : 'bg-red-100 text-red-800 border border-red-200'
+                        }`}>
+                          {document.status === 'active' ? '🟢 Active' : '🔴 Revoked'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 rounded-lg p-4">
+                      <label className="block text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-2 flex items-center">
+                        <Building className="h-4 w-4 mr-1" />
+                        Issued By
+                      </label>
+                      <p className="text-lg font-bold text-gray-900">{document.issuerName}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <label className="block text-sm font-semibold text-green-600 uppercase tracking-wide mb-2 flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Issue Date
+                        </label>
+                        <p className="text-gray-900 font-medium">{document.issuedAt.toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}</p>
+                      </div>
+                      <div className="bg-orange-50 rounded-lg p-4">
+                        <label className="block text-sm font-semibold text-orange-600 uppercase tracking-wide mb-2">Recipient</label>
+                        <p className="text-gray-900 font-medium">{document.recipientName}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {document.description && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</label>
+                      <p className="text-gray-700 leading-relaxed">{document.description}</p>
+                    </div>
+                  )}
+
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border-l-4 border-indigo-500">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Security Hash</label>
+                    <p className="text-xs text-gray-600 font-mono break-all bg-white px-2 py-1 rounded border">
+                      {document.hash}
+                    </p>
+                  </div>
                 </div>
               )}
 
-              <div className="bg-gray-50 rounded-lg p-4 mt-6">
-                <p className="text-xs text-gray-500 text-center">
-                  Document Hash: {document.hash}
-                </p>
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    setVerificationResult(null);
+                    setVerificationMethod('link');
+                  }}
+                  className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Verify Another Document
+                </button>
+                <a
+                  href="/"
+                  className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-center"
+                >
+                  Back to Home
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Document Display - Right Side */}
+          {document && document.documentUrl && (
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-600 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-white flex items-center">
+                    <FileText className="h-6 w-6 mr-2" />
+                    Document Preview
+                  </h3>
+                  <div className="flex space-x-2">
+                    <a
+                      href={document.documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-all duration-200 text-sm font-medium border border-white/20"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Open Full
+                    </a>
+                    <a
+                      href={document.documentUrl}
+                      download={document.originalFileName || `${document.title}.pdf`}
+                      className="flex items-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200 text-sm font-medium shadow-sm"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              {/* PDF Viewer */}
+              <div className="relative bg-gray-100" style={{ height: '700px' }}>
+                <iframe
+                  src={`${document.documentUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+                  className="w-full h-full border-0"
+                  title="Document Preview"
+                  onError={(e) => {
+                    // Fallback to Google Docs viewer if direct PDF viewing fails
+                    const iframe = e.target as HTMLIFrameElement;
+                    iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(document.documentUrl!)}&embedded=true`;
+                  }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
+                  <p className="text-white text-sm font-medium text-center">
+                    📄 {document.originalFileName || `${document.title}.pdf`}
+                  </p>
+                </div>
               </div>
             </div>
           )}
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setVerificationResult(null);
-                setVerificationMethod('link');
-              }}
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
-            >
-              Verify Another Document
-            </button>
-          </div>
         </div>
-
-        {/* Document Display - Right Side */}
-        {document && document.documentUrl && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Document Preview</h3>
-              <div className="flex space-x-2">
-                <a
-                  href={document.documentUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                >
-                  <FileText className="h-4 w-4 mr-1" />
-                  Open
-                </a>
-                <a
-                  href={document.documentUrl}
-                  download={document.originalFileName || `${document.title}.pdf`}
-                  className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                >
-                  <FileText className="h-4 w-4 mr-1" />
-                  Download
-                </a>
-              </div>
-            </div>
-            
-            {/* PDF Viewer */}
-            <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-              <iframe
-                src={`${document.documentUrl}#toolbar=1&navpanes=0&scrollbar=1`}
-                className="w-full h-full"
-                title="Document Preview"
-                onError={(e) => {
-                  // Fallback to Google Docs viewer if direct PDF viewing fails
-                  const iframe = e.target as HTMLIFrameElement;
-                  iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(document.documentUrl!)}&embedded=true`;
-                }}
-              />
-            </div>
-            
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-500">
-                {document.originalFileName || `${document.title}.pdf`}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     );
   };
