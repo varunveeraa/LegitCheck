@@ -90,80 +90,131 @@ const VerifyDocument: React.FC = () => {
     const { document, isValid, message } = verificationResult;
 
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
-        <div className="text-center mb-6">
-          {isValid ? (
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          ) : (
-            <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        {/* Verification Details - Left Side */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-6">
+            {isValid ? (
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            ) : (
+              <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            )}
+            <h2 className={`text-2xl font-bold mb-2 ${isValid ? 'text-green-700' : 'text-red-700'}`}>
+              {isValid ? 'Document Verified' : 'Verification Failed'}
+            </h2>
+            <p className="text-gray-600">{message}</p>
+          </div>
+
+          {document && (
+            <div className="space-y-4 border-t pt-6">
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Document Title</label>
+                  <p className="text-gray-900 font-medium">{document.title}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Document Type</label>
+                  <p className="text-gray-900 capitalize">{document.documentType}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Issued By</label>
+                  <p className="text-gray-900 font-medium">{document.issuerName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Issued Date</label>
+                  <p className="text-gray-900">{document.issuedAt.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Recipient</label>
+                  <p className="text-gray-900">{document.recipientName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    document.status === 'active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {document.status}
+                  </span>
+                </div>
+              </div>
+              
+              {document.description && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                  <p className="text-gray-900">{document.description}</p>
+                </div>
+              )}
+
+              <div className="bg-gray-50 rounded-lg p-4 mt-6">
+                <p className="text-xs text-gray-500 text-center">
+                  Document Hash: {document.hash}
+                </p>
+              </div>
+            </div>
           )}
-          <h2 className={`text-2xl font-bold mb-2 ${isValid ? 'text-green-700' : 'text-red-700'}`}>
-            {isValid ? 'Document Verified' : 'Verification Failed'}
-          </h2>
-          <p className="text-gray-600">{message}</p>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => {
+                setVerificationResult(null);
+                setVerificationMethod('link');
+              }}
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Verify Another Document
+            </button>
+          </div>
         </div>
 
-        {document && (
-          <div className="space-y-4 border-t pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Document Title</label>
-                <p className="text-gray-900 font-medium">{document.title}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Document Type</label>
-                <p className="text-gray-900 capitalize">{document.documentType}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Issued By</label>
-                <p className="text-gray-900 font-medium">{document.issuerName}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Issued Date</label>
-                <p className="text-gray-900">{document.issuedAt.toLocaleDateString()}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Recipient</label>
-                <p className="text-gray-900">{document.recipientName}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  document.status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {document.status}
-                </span>
+        {/* Document Display - Right Side */}
+        {document && document.documentUrl && (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Document Preview</h3>
+              <div className="flex space-x-2">
+                <a
+                  href={document.documentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  Open
+                </a>
+                <a
+                  href={document.documentUrl}
+                  download={document.originalFileName || `${document.title}.pdf`}
+                  className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  Download
+                </a>
               </div>
             </div>
             
-            {document.description && (
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
-                <p className="text-gray-900">{document.description}</p>
-              </div>
-            )}
-
-            <div className="bg-gray-50 rounded-lg p-4 mt-6">
-              <p className="text-xs text-gray-500 text-center">
-                Document Hash: {document.hash}
+            {/* PDF Viewer */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+              <iframe
+                src={`${document.documentUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+                className="w-full h-full"
+                title="Document Preview"
+                onError={(e) => {
+                  // Fallback to Google Docs viewer if direct PDF viewing fails
+                  const iframe = e.target as HTMLIFrameElement;
+                  iframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(document.documentUrl!)}&embedded=true`;
+                }}
+              />
+            </div>
+            
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-500">
+                {document.originalFileName || `${document.title}.pdf`}
               </p>
             </div>
           </div>
         )}
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => {
-              setVerificationResult(null);
-              setVerificationMethod('link');
-            }}
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
-            Verify Another Document
-          </button>
-        </div>
       </div>
     );
   };
