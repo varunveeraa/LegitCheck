@@ -32,6 +32,7 @@ export interface Document {
   issuedAt: Date;
   revokedAt?: Date;
   revokedBy?: string;
+  revokedReason?: string;
   verificationUrl: string;
   qrCodeData: string;
   documentUrl?: string;
@@ -39,10 +40,10 @@ export interface Document {
 }
 
 export interface VerificationLog {
-  id: string;
+  id?: string;
   documentId: string;
-  verifierInfo?: string;
   timestamp: Date;
   result: 'valid' | 'invalid' | 'revoked';
   ipAddress?: string;
+  userAgent?: string;
 }
